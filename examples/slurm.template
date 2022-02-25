@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=4G
+#SBATCH --time=120:00:00
+
+set -e
+set -u
+set -o pipefail
+
+if command -v squeue &> /dev/null
+then
+    module load fosscuda/2019b
+    module load beast/2.6.6
+    module load beagle-lib/3.1.2
+fi
+
