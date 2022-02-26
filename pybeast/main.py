@@ -173,7 +173,7 @@ def main(
     samples: int = typer.Option(None, help="Number of samples to collect."),
     threads: int = typer.Option(
         1,
-        help="Number of threads and beagle instances to use (one beagle per core). If not specified defaults to number of cores.",
+        help="Number of threads and beagle instances to use (one beagle per thread).",
     ),
     mc3: bool = typer.Option(
         False, help="Use dynamic-beast to set default options for running MCMCMC."
