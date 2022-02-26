@@ -1,5 +1,6 @@
 import json
 import os
+import glob
 from pathlib import Path
 from re import S
 import textwrap
@@ -22,11 +23,14 @@ def create_beast_run_command(
     threads: int,
     json_path: Path,
     seed: int,
+    resume: bool
 ):
     """Create the BEAST run command"""
 
     cmd = Command("beast")
 
+    if resume:
+        cmd.add_arg("-resume")
     cmd.add_arg("-overwrite")
     cmd.add_arg("-beagle")
     cmd.add_arg(f"-statefile {str(dynamic_xml_path).replace('.dynamic.', '.')}.state")
@@ -76,27 +80,36 @@ def create_dynamic_template(beast_xml_file: Path, outdir: Path) -> Path:
 
 
 def create_working_directory(
-    fasta_file_path: Path,
+    beast_xml_path: Path,
     description: str,
     group: str,
     overwrite: bool,
     duplicate: int,
+    resume: bool
 ) -> Path:
-    basename = fasta_file_path.stem
-    working_directory = f"{basename}"
-    if description:
-        working_directory = f"{description}_{working_directory}"
-    if group:
-        working_directory = f"{group}/{working_directory}"
-    number = duplicate
-    working_directory_numbered = Path(f"{working_directory}_{number:03d}")
+    if resume:
+        working_directory = Path(f"{beast_xml_path.parent}_RESUMED")
+        working_directory_numbered = Path(f"{beast_xml_path.parent}_RESUMED_{duplicate:03d}")
+    else:
+        basename = beast_xml_path.stem
+        working_directory = f"{basename}"
+        if description:
+            working_directory = f"{description}_{working_directory}"
+        if group:
+            working_directory = f"{group}/{working_directory}"
+        working_directory_numbered = Path(f"{working_directory}_{duplicate:03d}")
     if overwrite and working_directory_numbered.exists():
         shutil.rmtree(working_directory_numbered)
     while working_directory_numbered.exists():
-        number += 1
-        working_directory_numbered = Path(f"{working_directory}_{number:03d}")
+        duplicate += 1
+        working_directory_numbered = Path(f"{working_directory}_{duplicate:03d}")
     os.makedirs(working_directory_numbered)
     os.makedirs(f"{working_directory_numbered}/logs")
+    if resume:
+        shutil.copytree(f"{beast_xml_path.parent}/logs/", f"{working_directory_numbered}/logs/", dirs_exist_ok=True)
+        state_file = glob.glob(f"{beast_xml_path.parent}/*.state")[0]
+        shutil.copy(state_file, f"{working_directory_numbered}")
+        shutil.copy(f"{beast_xml_path.parent}/seed.txt", f"{working_directory_numbered}")
     return Path(working_directory_numbered)
 
 
@@ -117,6 +130,7 @@ def set_dynamic_vars(json_path, sample_frequency, chain_length, dynamic_variable
 def main(
     beast_xml_path: Path,
     run: str = typer.Option(None, help="Run the run.sh file using this command."),
+    resume: bool = typer.Option(False, help="Resume the specified run."),
     group: str = typer.Option(None, help="Group runs in this folder."),
     description: str = typer.Option("", help="Text to prepend to output folder name."),
     overwrite: bool = typer.Option(False, help="Overwrite run folder if exists."),
@@ -146,7 +160,7 @@ def main(
 ):
     for i in range(duplicates):
 
-        sample_frequency = chain_length // samples
+        
 
         working_directory = create_working_directory(
             beast_xml_path,
@@ -154,6 +168,7 @@ def main(
             group=group,
             overwrite=overwrite,
             duplicate=i + 1,
+            resume=resume
         )
 
         dynamic_xml_path, json_path = create_dynamic_template(
@@ -162,6 +177,7 @@ def main(
         dynamic_variables = {
             d.split("=")[0]: "".join(d.split("=")[1:]) for d in dynamic_variable
         }
+        sample_frequency = chain_length // samples
         set_dynamic_vars(
             json_path,
             sample_frequency=sample_frequency,
@@ -170,15 +186,17 @@ def main(
         )
 
         beast_seed = str(random.randint(1, 10000000))
-
         if seed:
-            beast_seed = seed
+            beast_seed = str(seed)
+        elif resume:
+            with open(f"{working_directory}/seed.txt") as f:
+                beast_seed = f.read()
 
         with open(f"{working_directory}/seed.txt", "w") as f:
             f.write(beast_seed)
 
         cmd_list = create_beast_run_command(
-            dynamic_xml_path, working_directory, threads, json_path, beast_seed
+            dynamic_xml_path, working_directory, threads, json_path, beast_seed, resume
         )
 
         run_file = f"{working_directory}/run.sh"
