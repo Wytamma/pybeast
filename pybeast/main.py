@@ -23,7 +23,7 @@ def create_beast_run_command(
     threads: int,
     json_path: Path,
     seed: int,
-    resume: bool
+    resume: bool,
 ):
     """Create the BEAST run command"""
 
@@ -85,11 +85,13 @@ def create_working_directory(
     group: str,
     overwrite: bool,
     duplicate: int,
-    resume: bool
+    resume: bool,
 ) -> Path:
     if resume:
         working_directory = Path(f"{beast_xml_path.parent}_RESUMED")
-        working_directory_numbered = Path(f"{beast_xml_path.parent}_RESUMED_{duplicate:03d}")
+        working_directory_numbered = Path(
+            f"{beast_xml_path.parent}_RESUMED_{duplicate:03d}"
+        )
     else:
         basename = beast_xml_path.stem
         working_directory = f"{basename}"
@@ -106,10 +108,16 @@ def create_working_directory(
     os.makedirs(working_directory_numbered)
     os.makedirs(f"{working_directory_numbered}/logs")
     if resume:
-        shutil.copytree(f"{beast_xml_path.parent}/logs/", f"{working_directory_numbered}/logs/", dirs_exist_ok=True)
+        shutil.copytree(
+            f"{beast_xml_path.parent}/logs/",
+            f"{working_directory_numbered}/logs/",
+            dirs_exist_ok=True,
+        )
         state_file = glob.glob(f"{beast_xml_path.parent}/*.state")[0]
         shutil.copy(state_file, f"{working_directory_numbered}")
-        shutil.copy(f"{beast_xml_path.parent}/seed.txt", f"{working_directory_numbered}")
+        shutil.copy(
+            f"{beast_xml_path.parent}/seed.txt", f"{working_directory_numbered}"
+        )
     return Path(working_directory_numbered)
 
 
@@ -160,15 +168,13 @@ def main(
 ):
     for i in range(duplicates):
 
-        
-
         working_directory = create_working_directory(
             beast_xml_path,
             description,
             group=group,
             overwrite=overwrite,
             duplicate=i + 1,
-            resume=resume
+            resume=resume,
         )
 
         dynamic_xml_path, json_path = create_dynamic_template(
