@@ -89,3 +89,45 @@ do
         $XML_FILE
 done
 ```
+
+## Help
+
+```
+❯ pybeast --help
+Usage: pybeast [OPTIONS] BEAST_XML_PATH
+
+Arguments:
+  BEAST_XML_PATH  [required]
+
+Options:
+  --run TEXT                    Run the run.sh file using this command.
+  --resume / --no-resume        Resume the specified run.  [default: no-
+                                resume]
+  --group TEXT                  Group runs in this folder.
+  --description TEXT            Text to prepend to output folder name.
+  --overwrite / --no-overwrite  Overwrite run folder if exists.  [default: no-
+                                overwrite]
+  --seed INTEGER                Seed to use in beast analysis.
+  --duplicates INTEGER          Number for duplicate runs to create.
+                                [default: 1]
+  -d, --dynamic-variable TEXT   Dynamic variable in the format <key>=<value>.
+  --template PATH               Template for run.sh. Beast command is append
+                                to end of file.
+  -v, --template-variable TEXT  Template variable in the format <key>=<value>.
+  --chain-length INTEGER        Number of step in MCMC chain.
+  --samples INTEGER             Number of samples to collect.
+  --threads INTEGER             Number of threads and beagle instances to use
+                                (one beagle per core). If not specified
+                                defaults to number of cores.  [default: 1]
+  --mc3 / --no-mc3              Use dynamic-beast to set default options for
+                                running MCMCMC.  [default: no-mc3]
+  --ps / --no-ps                Use dynamic-beast to set default options for
+                                running PathSampler.  [default: no-ps]
+  --ns / --no-ns                Use dynamic-beast to set default options for
+                                running multi threaded nested sampling.
+                                [default: no-ns]
+  --install-completion          Install completion for the current shell.
+  --show-completion             Show completion for the current shell, to copy
+                                it or customize the installation.
+  --help                        Show this message and exit.
+  ```
