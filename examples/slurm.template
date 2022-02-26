@@ -8,6 +8,7 @@ set -e
 set -u
 set -o pipefail
 
+# only load modules is slurm is available 
 if command -v squeue &> /dev/null
 then
     module load fosscuda/2019b
