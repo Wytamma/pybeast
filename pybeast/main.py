@@ -11,29 +11,9 @@ from dynamic_beast import create_dynamic_xml
 from typing import List, Optional
 from dataclasses import dataclass, field
 
+from pybeast import Template, Command
+
 app = typer.Typer()
-
-
-@dataclass
-class Command:
-    command: str
-    final: Optional[str] = None
-    args: List[str] = field(default_factory=list)
-
-    def add_arg(self, arg: str):
-        self.args.append(arg)
-
-    def add_output_handler(self, pipe, value):
-        self.final = f"{pipe} {value}"
-
-    def format(self, indent=4):
-        join_str = f' \\\n{" " * indent}'
-        return f"""{self.command}{join_str}{join_str.join(self.args)} {self.final if self.final else ''}"""
-
-    def __str__(self) -> str:
-        return (
-            f"{self.command} {' '.join(self.args)} {self.final if self.final else ''}"
-        )
 
 
 def create_beast_run_command(
@@ -51,7 +31,7 @@ def create_beast_run_command(
     cmd.add_arg("-beagle")
     cmd.add_arg(f"-statefile {str(dynamic_xml_path).replace('.dynamic.', '.')}.state")
     cmd.add_arg(f"-seed {seed}")
-    cmd.add_arg(f"-prefix {working_directory}/")
+    cmd.add_arg(f"-prefix {working_directory}/logs/")
     cmd.add_arg(f"-instances {threads}")
     cmd.add_arg(f"-threads {threads}")
     cmd.add_arg(f"-DF {json_path}")
@@ -59,7 +39,7 @@ def create_beast_run_command(
     cmd.add_arg(str(dynamic_xml_path))
 
     cmd.add_output_handler(
-        ">>", f"{working_directory}/{working_directory.stem}.out 2>&1"
+        "2>&1 | tee", f"{working_directory}/{working_directory.stem}.out"
     )
 
     return cmd
@@ -69,18 +49,17 @@ def populate_template(
     outfile: Path,
     cmd: Command,
     template_path: Path = None,
+    template_variables: dict = None,
 ) -> Path:
     """Fill in a given template"""
 
     if template_path:
-        with open(template_path) as f:
-            template = "".join(f.readlines())
-
+        template = Template(template_path)
+        template.populate(BEAST=cmd.format(2), **template_variables)
+        template.write(outfile)
+    else:
         with open(outfile, "w") as f:
-            f.write(template)
-
-    with open(outfile, "a") as f:
-        f.write(cmd.format(2))
+            f.write(cmd.format(2))
 
     return outfile
 
@@ -117,6 +96,7 @@ def create_working_directory(
         number += 1
         working_directory_numbered = Path(f"{working_directory}_{number:03d}")
     os.makedirs(working_directory_numbered)
+    os.makedirs(f"{working_directory_numbered}/logs")
     return Path(working_directory_numbered)
 
 
@@ -146,10 +126,16 @@ def main(
         None,
         "--dynamic-variable",
         "-d",
-        help="Dynamic variable in the format key=value.",
+        help="Dynamic variable in the format <key>=<value>.",
     ),
     template: Path = typer.Option(
         None, help="Template for run.sh. Beast command is append to end of file."
+    ),
+    template_variable: Optional[List[str]] = typer.Option(
+        None,
+        "--template-variable",
+        "-v",
+        help="Template variable in the format <key>=<value>.",
     ),
     chain_length: int = typer.Option(10000000, help="Number of step in MCMC chain."),
     samples: int = typer.Option(10000, help="Number of samples to collect."),
@@ -173,7 +159,9 @@ def main(
         dynamic_xml_path, json_path = create_dynamic_template(
             beast_xml_path, outdir=working_directory
         )
-        dynamic_variables = {d.split("=")[0]: d.split("=")[1] for d in dynamic_variable}
+        dynamic_variables = {
+            d.split("=")[0]: "".join(d.split("=")[1:]) for d in dynamic_variable
+        }
         set_dynamic_vars(
             json_path,
             sample_frequency=sample_frequency,
@@ -195,10 +183,15 @@ def main(
 
         run_file = f"{working_directory}/run.sh"
 
+        template_variables = {
+            d.split("=")[0]: "".join(d.split("=")[1:]) for d in template_variable
+        }
+
         populate_template(
             run_file,
             cmd_list,
             template_path=template,
+            template_variables=template_variables,
         )
         typer.echo(f"Created run file -> {run_file}")
 
