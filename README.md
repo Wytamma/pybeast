@@ -7,7 +7,7 @@
 PyBEAST helps with running BEAST with best practices. Configure a beast run in a reproducible manner can be time consuming. pyBEAST is designed to making running beast as simple as possible. 
 
 ## Install
-Install `pybeast` with pip (requires python -V >= 3.6.2).
+Install `pybeast` with pip (requires python -V >= 3.7).
 
 ```bash
 pip install pybeast
@@ -24,13 +24,6 @@ pybeast beast.xml
 1. Create output folder and run command
 2. Ensures the run is self-contained and reproducible.
 
-
-```bash
-pybeast --template slurm_template.pbs beast.xml
-```
-1. Create output folder and run command (using template)
-
-
 ### SLURM example 
 
 This example using the SLURM template in the examples folder to submit the beast run as a job.
@@ -38,6 +31,8 @@ This example using the SLURM template in the examples folder to submit the beast
 ```bash
 pybeast --run sbatch --template examples/slurm.template examples/beast.xml
 ```
+
+
 
 Here we use the -v (--template-variable) option to request 4 cpus. 
 ```bash
