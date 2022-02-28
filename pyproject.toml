@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pybeast"
-version = "0.3.1"
+version = "0.3.2"
 description = ""
 authors = ["Wytamma Wirth <wytamma.wirth@me.com>"]
 readme = "README.md"
@@ -11,7 +11,7 @@ pybeast = "pybeast.main:app"
 [tool.poetry.dependencies]
 python = ">=3.6.2,<4.0"
 typer = ">=0.3.2"
-dynamic-beast = ">=1.8.0"
+dynamic-beast = ">=1.8.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"
