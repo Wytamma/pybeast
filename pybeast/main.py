@@ -31,7 +31,6 @@ def create_beast_run_command(
 
     if resume:
         cmd.add_arg("-resume")
-    cmd.add_arg("-overwrite")
     cmd.add_arg("-beagle")
     cmd.add_arg(f"-statefile {str(dynamic_xml_path).replace('.dynamic.', '.')}.state")
     cmd.add_arg(f"-seed {seed}")
@@ -96,9 +95,7 @@ def create_run_directory(
 ) -> Path:
     if resume:
         run_directory = Path(f"{beast_xml_path.parent}_RESUMED")
-        run_directory_numbered = Path(
-            f"{beast_xml_path.parent}_RESUMED_{duplicate:03d}"
-        )
+        run_directory_numbered = Path(f"{run_directory}_{duplicate:03d}")
     else:
         basename = beast_xml_path.stem
         run_directory = f"{basename}"
