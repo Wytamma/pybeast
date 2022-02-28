@@ -41,7 +41,7 @@
                     
             <parameter id="growthRate" spec="parameter.RealParameter" name="stateNode">3.0E-4</parameter>
                     
-            <parameter id="ucldMean" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
+            <!-- <parameter id="ucldMean" spec="parameter.RealParameter" name="stateNode">1.0</parameter> -->
            
             <parameter id="ucldStdev" spec="parameter.RealParameter" lower="0.0" name="stateNode">0.1</parameter>
                     
@@ -115,7 +115,7 @@
                                 
                 </prior>
 
-                <prior id="MeanRatePrior" name="distribution" x="@ucldMean">
+                <!-- <prior id="MeanRatePrior" name="distribution" x="@ucldMean">
                     <Gamma id="Gamma.5" name="distr">
                                             
                         <parameter id="RealParameter.82" spec="parameter.RealParameter" estimate="false" name="alpha">1</parameter>
@@ -124,7 +124,7 @@
                                         
                     </Gamma>
                                 
-                </prior>
+                </prior> -->
                             
                 <prior id="ucldStdevPrior" name="distribution" x="@ucldStdev">
                                     
@@ -158,13 +158,16 @@
                                         
                     </siteModel>
                                     
-                    <branchRateModel id="RelaxedClock" spec="beast.evolution.branchratemodel.UCRelaxedClockModel" clock.rate="@ucldMean" rateCategories="@rateCategories" tree="@Tree">
+                    <!-- <branchRateModel id="RelaxedClock" spec="beast.evolution.branchratemodel.UCRelaxedClockModel" clock.rate="@ucldMean" rateCategories="@rateCategories" tree="@Tree"> -->
+                    <branchRateModel id="RelaxedClock" spec="beast.evolution.branchratemodel.UCRelaxedClockModel" rateCategories="@rateCategories" tree="@Tree">
                                             
                         <LogNormal id="LogNormalDistributionModel" S="@ucldStdev" meanInRealSpace="true" name="distr">
                                                     
                             <parameter id="RealParameter.25" spec="parameter.RealParameter" estimate="false" lower="0.0" name="M" upper="1.0">1.0</parameter>
                                                 
                         </LogNormal>
+
+                        <parameter id="ucldMean" spec="parameter.RealParameter" estimate="false" name="clock.rate">1.0</parameter>
                                         
                     </branchRateModel>
                                 
@@ -196,7 +199,7 @@
             
         <operator id="GrowthRateRandomWalk" spec="RealRandomWalkOperator" parameter="@growthRate" weight="3.0" windowSize="1.0"/>
             
-        <operator id="ucldMeanScaler" spec="ScaleOperator" parameter="@ucldMean" scaleFactor="0.5" weight="1.0"/>
+        <!-- <operator id="ucldMeanScaler" spec="ScaleOperator" parameter="@ucldMean" scaleFactor="0.5" weight="1.0"/> -->
             
         <operator id="ucldStdevScaler" spec="ScaleOperator" parameter="@ucldStdev" scaleFactor="0.5" weight="3.0"/>
             
@@ -206,13 +209,13 @@
             
         <operator id="CategoriesUniform" spec="UniformOperator" parameter="@rateCategories" weight="10.0"/>
             
-        <operator id="relaxedUpDownOperator" spec="UpDownOperator" scaleFactor="0.75" weight="3.0">
+        <!-- <operator id="relaxedUpDownOperator" spec="UpDownOperator" scaleFactor="0.75" weight="3.0">
                     
             <up idref="ucldMean"/>
                     
             <down idref="Tree"/>
                 
-        </operator>
+        </operator> -->
         
         <logger id="tracelog" spec="Logger" fileName="UCLN.iso.log" logEvery="1000" model="@posterior" sanitiseHeaders="true" sort="smart">
                     
@@ -236,7 +239,7 @@
                     
             <log idref="growthRate"/>
 
-            <log idref="ucldMean"/>
+            <!-- <log idref="ucldMean"/> -->
                     
             <log idref="ucldStdev"/>
                     

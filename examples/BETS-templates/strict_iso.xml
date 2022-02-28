@@ -34,7 +34,7 @@
                     
             <parameter id="gammaShape" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
                     
-            <parameter id="clockRate" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
+            <!-- <parameter id="clockRate" spec="parameter.RealParameter" name="stateNode">1.0</parameter> -->
                     
             <parameter id="kappa" spec="parameter.RealParameter" lower="0.0" name="stateNode">2.0</parameter>
                     
@@ -66,7 +66,7 @@
                                 
                 </distribution>
                             
-                <prior id="ClockPrior" name="distribution" x="@clockRate">
+                <!-- <prior id="ClockPrior" name="distribution" x="@clockRate">
                     <Gamma id="Gamma.1" name="distr">
                                             
                         <parameter id="RealParameter.82" spec="parameter.RealParameter" estimate="false" name="alpha">1</parameter>
@@ -74,7 +74,7 @@
                         <parameter id="RealParameter.83" spec="parameter.RealParameter" estimate="false" name="beta">1</parameter>
 
                     </Gamma>
-                </prior>
+                </prior> -->
                             
                 <prior id="ePopSizePrior" name="distribution" x="@ePopSize">
                                     
@@ -140,7 +140,12 @@
                                         
                     </siteModel>
                                     
-                    <branchRateModel id="StrictClock" spec="beast.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate"/>
+                    <!-- <branchRateModel id="StrictClock" spec="beast.evolution.branchratemodel.StrictClockModel" clock.rate="@clockRate"/> -->
+                    <branchRateModel id="StrictClock" spec="beast.evolution.branchratemodel.StrictClockModel">
+                                            
+                        <parameter id="clockRate" spec="parameter.RealParameter" estimate="false" name="clock.rate">1.0</parameter>
+                                        
+                    </branchRateModel>
                                 
                 </distribution>
                         
@@ -150,7 +155,7 @@
             
         <operator id="gammaShapeScaler" spec="ScaleOperator" parameter="@gammaShape" scaleFactor="0.5" weight="0.1"/>
             
-        <operator id="StrictClockRateScaler" spec="ScaleOperator" parameter="@clockRate" weight="3.0"/>
+        <!-- <operator id="StrictClockRateScaler" spec="ScaleOperator" parameter="@clockRate" weight="3.0"/>
             
         <operator id="strictClockUpDownOperator" spec="UpDownOperator" scaleFactor="0.75" weight="3.0">
                     
@@ -158,7 +163,7 @@
                     
             <down idref="Tree"/>
                 
-        </operator>
+        </operator> -->
             
         <operator id="KappaScaler" spec="ScaleOperator" parameter="@kappa" scaleFactor="0.5" weight="0.1"/>
             
@@ -192,7 +197,7 @@
                     
             <log id="TreeHeight" spec="beast.evolution.tree.TreeHeightLogger" tree="@Tree"/>
                     
-            <log idref="clockRate"/>
+            <!-- <log idref="clockRate"/> -->
                     
             <log idref="gammaShape"/>
                     
