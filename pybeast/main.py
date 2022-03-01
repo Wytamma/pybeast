@@ -2,8 +2,6 @@ import json
 import os
 import glob
 from pathlib import Path
-from re import S
-import textwrap
 import typer
 from typing import Optional, List, final
 import shutil
@@ -95,32 +93,32 @@ def create_run_directory(
 ) -> Path:
     if resume:
         run_directory = Path(f"{beast_xml_path.parent}_RESUMED")
-        run_directory_numbered = Path(f"{run_directory}_{duplicate:03d}")
     else:
         basename = beast_xml_path.stem
         run_directory = f"{basename}"
         if description:
-            run_directory = f"{description}_{run_directory}"
+            run_directory = Path(f"{description}_{run_directory}")
         if group:
-            run_directory = f"{group}/{run_directory}"
-        run_directory_numbered = Path(f"{run_directory}_{duplicate:03d}")
-    if overwrite and run_directory_numbered.exists():
-        shutil.rmtree(run_directory_numbered)
-    while run_directory_numbered.exists():
-        duplicate += 1
-        run_directory_numbered = Path(f"{run_directory}_{duplicate:03d}")
-    os.makedirs(run_directory_numbered)
-    os.makedirs(f"{run_directory_numbered}/logs")
+            run_directory = Path(f"{group}/{run_directory}")
+
+    if duplicate:
+        run_directory = Path(f"{run_directory}_{duplicate:03d}")
+
+    if overwrite and run_directory.exists():
+        shutil.rmtree(run_directory)
+
+    os.makedirs(run_directory)
+    os.makedirs(f"{run_directory}/logs")
     if resume:
         shutil.copytree(
             f"{beast_xml_path.parent}/logs/",
-            f"{run_directory_numbered}/logs/",
+            f"{run_directory}/logs/",
             dirs_exist_ok=True,
         )
         state_file = glob.glob(f"{beast_xml_path.parent}/*.state")[0]
-        shutil.copy(state_file, f"{run_directory_numbered}")
-        shutil.copy(f"{beast_xml_path.parent}/seed.txt", f"{run_directory_numbered}")
-    return Path(run_directory_numbered)
+        shutil.copy(state_file, f"{run_directory}")
+        shutil.copy(f"{beast_xml_path.parent}/seed.txt", f"{run_directory}")
+    return Path(run_directory)
 
 
 def set_dynamic_vars(json_path, samples, chain_length, dynamic_variables):
@@ -180,17 +178,18 @@ def main(
     ),
     ns: bool = typer.Option(
         False,
-        help="Use dynamic-beast to set default options for running multi threaded nested sampling.",
+        help="Use dynamic-beast to set default options for running sampling.",
     ),
 ):
-    for i in range(duplicates):
-
+    for duplicate in range(1, duplicates + 1):
+        if duplicates == 1:
+            duplicate = None
         run_directory = create_run_directory(
             beast_xml_path,
             description,
             group=group,
             overwrite=overwrite,
-            duplicate=i + 1,
+            duplicate=duplicate,
             resume=resume,
         )
 

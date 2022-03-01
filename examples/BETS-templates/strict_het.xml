@@ -29,8 +29,9 @@
             <tree id="Tree" spec="beast.evolution.tree.Tree" name="stateNode">
                 <trait id="Date" spec="feast.fileio.TraitSetFromTaxonSet"
                    delimiter="_"
+                   takeGroup="0"
                    everythingAfterLast="true"
-                   dateFormat="d-M-yy"
+                   dateFormat="Y"
                    traitname="date">
                    <taxa id="taxonSet" spec="TaxonSet" alignment="@alignment"/>
                 </trait>

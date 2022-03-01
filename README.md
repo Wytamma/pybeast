@@ -62,33 +62,63 @@ The dynamic variables are saved to a `.json` file in the run directory. This fil
 
 ## Example 
 
-### BETS
+### pybeast + feast to run BETS.
 
-Use pybeast + feast to run BETS.
+This is an example of how pybeast can be used in combination with feast to easily perform a Bayesian Evaluation of Temporal Signal (BETS) analysis.
+
+BETS constitutes a formal test of the strength of temporal signal in a data set, which is an important prerequisite for obtaining reliable inferences in phylodynamic analyses. BETS is essentially model selection between four models. In the examples/BETS-templates folders there are four reuseable feast templates for performing BETS. The templates can be used with any alignment (beast dynamic variable $(alignment)) and parse dates from the descriptors (heterochronous). 
+
+Here is the alignment tag. By parsing the fileName to beast (`-d alignment=fileName`) the template can be reused with any dataset.
+
+```xml
+...
+<alignment id="alignment" spec='feast.fileio.AlignmentFromFasta' fileName="$(alignment)"/>
+...
+```
+
+Here is the date trait tag. Date parsing can be configured to work with any format using dynamic variables e.g. `-d Date.dateFormat=yyyy/M/d`.
+
+```xml
+<trait id="Date" spec="feast.fileio.TraitSetFromTaxonSet"
+    delimiter="_"
+    takeGroup="0"
+    everythingAfterLast="true"
+    dateFormat="Y"
+    traitname="date">
+    <taxa id="taxonSet" spec="TaxonSet" alignment="@alignment"/>
+</trait>
+```
+
+The script below (examples/run_BETS.sh) takes and fasta file and runs BETS on it using pyBEAST to setup the analysis.
 
 ```bash
-ALIGNMENT=${1?Must provide an ALIGNMENT}
+ALIGNMENT=${1?Must provide an ALIGNMENT.fasta file}
 for XML_FILE in $(ls examples/BETS-templates/*)
 do  
-    GROUP_NAME="BETS/$(basename "${ALIGNMENT}" .fasta)/$(basename "${XML_FILE}" .xml)"
+    GROUP_NAME="examples/$(basename "${ALIGNMENT}" .fasta)-BETS/$(basename "${XML_FILE}" .xml)"
     pybeast \
         --run sbatch \
-        --overwrite \
-        --threads 8 \
+        --group $GROUP_NAME \
         --duplicates 3 \
         --template examples/slurm.template \
-        -v cpus-per-task=8 \
-        --group $GROUP_NAME \
+        -v cpus-per-task=2 \
+        --ns \
         -d "alignment=$ALIGNMENT" \
         -d "Date.delimiter=_" \
         -d "Date.dateFormat=yyyy/M/dd" \
-        --ps \
-        -d "ps.nrOfSteps=50" \
-        -d "ps.chainLength=250000" \
-        -d "ps.rootdir={{run_directory}}/logs" \
+        -d "Date.everythingAfterLast=true" \
+        -d "mcmc.particleCount=32" \
         $XML_FILE
 done
 ```
+
+The script process_BETS.py will process and plot the BETS output (marginal likelihood estimates).
+
+```
+python examples/process_BETS.py examples/influenza
+```
+
+![](examples/Influenza/BETS.png)
 
 ## Help
 
@@ -101,33 +131,22 @@ Arguments:
 
 Options:
   --run TEXT                    Run the run.sh file using this command.
-  --resume / --no-resume        Resume the specified run.  [default: no-
-                                resume]
+  --resume / --no-resume        Resume the specified run.  [default: no-resume]
   --group TEXT                  Group runs in this folder.
   --description TEXT            Text to prepend to output folder name.
-  --overwrite / --no-overwrite  Overwrite run folder if exists.  [default: no-
-                                overwrite]
+  --overwrite / --no-overwrite  Overwrite run folder if exists.  [default: no-overwrite]
   --seed INTEGER                Seed to use in beast analysis.
-  --duplicates INTEGER          Number for duplicate runs to create.
-                                [default: 1]
+  --duplicates INTEGER          Number for duplicate runs to create.  [default: 1]
   -d, --dynamic-variable TEXT   Dynamic variable in the format <key>=<value>.
-  --template PATH               Template for run.sh. Beast command is append
-                                to end of file.
+  --template PATH               Template for run.sh. Beast command is append to end of file.
   -v, --template-variable TEXT  Template variable in the format <key>=<value>.
   --chain-length INTEGER        Number of step in MCMC chain.
   --samples INTEGER             Number of samples to collect.
-  --threads INTEGER             Number of threads and beagle instances to use
-                                (one beagle per core). If not specified
-                                defaults to number of cores.  [default: 1]
-  --mc3 / --no-mc3              Use dynamic-beast to set default options for
-                                running MCMCMC.  [default: no-mc3]
-  --ps / --no-ps                Use dynamic-beast to set default options for
-                                running PathSampler.  [default: no-ps]
-  --ns / --no-ns                Use dynamic-beast to set default options for
-                                running multi threaded nested sampling.
-                                [default: no-ns]
+  --threads INTEGER             Number of threads and beagle instances to use (one beagle per thread).  [default: 1]
+  --mc3 / --no-mc3              Use dynamic-beast to set default options for running MCMCMC.  [default: no-mc3]
+  --ps / --no-ps                Use dynamic-beast to set default options for running PathSampler.  [default: no-ps]
+  --ns / --no-ns                Use dynamic-beast to set default options for running nested sampling. [default: no-ns]
   --install-completion          Install completion for the current shell.
-  --show-completion             Show completion for the current shell, to copy
-                                it or customize the installation.
+  --show-completion             Show completion for the current shell, to copy it or customize the installation.
   --help                        Show this message and exit.
   ```
