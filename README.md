@@ -4,7 +4,7 @@
 [![tests](https://github.com/Wytamma/pybeast/actions/workflows/test.yml/badge.svg)](https://github.com/Wytamma/pybeast/actions/workflows/test.yml)
 [![cov](https://codecov.io/gh/Wytamma/pybeast/branch/master/graph/badge.svg)](https://codecov.io/gh/Wytamma/pybeast)
 
-PyBEAST helps with running BEAST with best practices. Configure a beast run in a reproducible manner can be time consuming. pyBEAST is designed to making running beast as simple as possible. 
+PyBEAST helps with running BEAST2 with best practices. Configure a beast run in a reproducible manner can be time consuming. PyBEAST is designed to make configuring beast as simple as possible. 
 
 ## Install
 Install `pybeast` with pip (requires python -V >= 3.7).
