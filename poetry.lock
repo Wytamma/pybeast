@@ -72,7 +72,7 @@ python-versions = "*"
 
 [[package]]
 name = "dynamic-beast"
-version = "1.8.1"
+version = "1.8.2"
 description = ""
 category = "main"
 optional = false
@@ -366,7 +366,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.2,<4.0"
-content-hash = "04a38ed4bfe692823a5c0ab6921887d9973974268657518835b9c094876a542a"
+content-hash = "c838d76f77393a66751bdac0dbd4e2c4b4883d5766aa26ca216d9aa04ab91629"
 
 [metadata.files]
 atomicwrites = [
@@ -443,8 +443,8 @@ distlib = [
     {file = "distlib-0.3.4.zip", hash = "sha256:e4b58818180336dc9c529bfb9a0b58728ffc09ad92027a3f30b7cd91e3458579"},
 ]
 dynamic-beast = [
-    {file = "dynamic-beast-1.8.1.tar.gz", hash = "sha256:b1b06d60a25a8bf6aad9a119b831d243032adeed936249dd780f04dc4b44cd00"},
-    {file = "dynamic_beast-1.8.1-py3-none-any.whl", hash = "sha256:db26c138a5adac31baf21ea90cc8cf2c73d07d929989eb23227e625639643482"},
+    {file = "dynamic-beast-1.8.2.tar.gz", hash = "sha256:5678d296f79c3678013baac546d379f74938045cfb2f12fdf1685f723a3a972c"},
+    {file = "dynamic_beast-1.8.2-py3-none-any.whl", hash = "sha256:ebe0521b97283e94701a257b1ccb2137fe0bbdc7de1005c86354385533a788f5"},
 ]
 filelock = [
     {file = "filelock-3.4.1-py3-none-any.whl", hash = "sha256:a4bc51381e01502a30e9f06dd4fa19a1712eab852b6fb0f84fd7cce0793d8ca3"},
