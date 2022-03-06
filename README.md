@@ -89,7 +89,7 @@ Here is the date trait tag. Date parsing can be configured to work with any form
 </trait>
 ```
 
-The script below (examples/run_BETS.sh) takes and fasta file and runs BETS on it using pyBEAST to setup the analysis.
+The script below (examples/run_BETS.sh) takes and fasta file and runs BETS on it using pyBEAST to setup the analysis. Here we analyse the `ice_viruses_cleaned` dataset from the TempEst [tutorial](https://beast.community/tempest_tutorial).  
 
 ```bash
 ALIGNMENT=${1?Must provide an ALIGNMENT.fasta file}
@@ -104,21 +104,32 @@ do
         -v cpus-per-task=2 \
         --ns \
         -d "alignment=$ALIGNMENT" \
-        -d "Date.delimiter=_" \
-        -d "Date.dateFormat=yyyy/M/dd" \
-        -d "Date.everythingAfterLast=true" \
         -d "mcmc.particleCount=32" \
         $XML_FILE
 done
 ```
 
-The script process_BETS.py will process and plot the BETS output (marginal likelihood estimates).
+The script process_BETS.py will process and plot the BETS output (marginal likelihood mean estimates).
 
 ```
 python examples/process_BETS.py examples/influenza
 ```
 
-![](examples/Influenza/BETS.png)
+![](examples/BETS.png)
+
+We observe strongly positive (log) Bayes factors when including the sampling dates compared to when these dates are not included. Hence, these data demonstrate clear temporal signal, formally confirming the result from the TempEst tutorial. Our (log) marginal likelihood results point to a preference for the relaxed clock model, with a mean (log) Bayes factor of 14.65 in favor over the strict clock model.
+
+| Group	| Marginal likelihood	| Standard deviation | logBF |
+| ----- | ------------------- | ------------------ | ----- |
+| UCLN_het |  -4152.573951 | 2.246429 | 0.000000 |
+| UCLN_iso | -4245.626864	| 2.717245 | -93.052913 |
+| strict_het | -4167.228784	| 2.061483 | -14.654834 |
+| strict_iso | -4365.063450	| 2.475754 | -212.489499 |
+
+Note: SD from NS analysis can be used to determine if individual ML estimates are precise and and different subChain lengths should be used to determine if ML estimates are accurate. 
+
+
+
 
 ## Help
 
