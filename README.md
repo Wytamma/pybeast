@@ -112,7 +112,7 @@ done
 The script process_BETS.py will process and plot the BETS output (marginal likelihood mean estimates).
 
 ```
-python examples/process_BETS.py examples/influenza
+python examples/process_BETS.py examples/ice_viruses_cleaned
 ```
 
 ![](examples/BETS.png)
