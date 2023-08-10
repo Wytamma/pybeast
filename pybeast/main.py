@@ -22,6 +22,7 @@ def create_beast_run_command(
     json_path: Path,
     seed: int,
     resume: bool,
+    gpu: bool,
 ):
     """Create the BEAST run command"""
 
@@ -29,7 +30,10 @@ def create_beast_run_command(
 
     if resume:
         cmd.add_arg("-resume")
-    cmd.add_arg("-beagle")
+    if gpu:
+        cmd.add_arg("-beagle_gpu")
+    else
+        cmd.add_arg("-beagle")
     cmd.add_arg(f"-statefile {str(dynamic_xml_path).replace('.dynamic.', '.')}.state")
     cmd.add_arg(f"-seed {seed}")
     cmd.add_arg(f"-prefix {run_directory}/logs/")
@@ -144,6 +148,7 @@ def main(
     beast_xml_path: Path,
     run: str = typer.Option(None, help="Run the run.sh file using this command."),
     resume: bool = typer.Option(False, help="Resume the specified run."),
+    gpu: bool = typer.Option(False, help="Use Beagle GPU."),
     group: str = typer.Option(None, help="Group runs in this folder."),
     description: str = typer.Option("", help="Text to prepend to output folder name."),
     overwrite: bool = typer.Option(False, help="Overwrite run folder if exists."),
@@ -222,7 +227,7 @@ def main(
             f.write(beast_seed)
 
         cmd_list = create_beast_run_command(
-            dynamic_xml_path, run_directory, threads, json_path, beast_seed, resume
+            dynamic_xml_path, run_directory, threads, json_path, beast_seed, resume, gpu
         )
 
         run_file = f"{run_directory}/run.sh"
