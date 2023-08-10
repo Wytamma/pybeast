@@ -32,7 +32,7 @@ def create_beast_run_command(
         cmd.add_arg("-resume")
     if gpu:
         cmd.add_arg("-beagle_gpu")
-    else
+    else:
         cmd.add_arg("-beagle")
     cmd.add_arg(f"-statefile {str(dynamic_xml_path).replace('.dynamic.', '.')}.state")
     cmd.add_arg(f"-seed {seed}")
