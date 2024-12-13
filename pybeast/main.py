@@ -231,10 +231,12 @@ def main(
         )
 
         run_file = f"{run_directory}/run.sh"
-
-        template_variables = {
-            d.split("=")[0]: "".join(d.split("=")[1:]) for d in template_variable
-        }
+        
+        template_variables = {}
+        if template_variable:
+            template_variables = {
+                d.split("=")[0]: "".join(d.split("=")[1:]) for d in template_variable
+            }
 
         populate_template(
             run_file,
