@@ -231,7 +231,7 @@ def main(
         )
 
         run_file = f"{run_directory}/run.sh"
-        
+
         template_variables = {}
         if template_variable:
             template_variables = {
